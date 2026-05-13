@@ -18,29 +18,42 @@ clock = pygame.time.Clock()
 running = True 
 user_answer = False
 state = "PLAYING"
+feedback_until = 0
+feedback_color = None
+
 while running:
     if state == "PLAYING":
+        current_time = time.time()
+        
+        if feedback_color is not None and current_time >= feedback_until:
+            trial_di_test = generate_trial(rng)
+            feedback_color = None
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             
             if event.type == pygame.KEYDOWN:
-                attempts += 1
-                if event.key == pygame.K_LEFT:
-                    user_answer = False
+                if current_time < feedback_until:
+                    continue
+
+                if event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+                    attempts += 1
+                    if event.key == pygame.K_LEFT:
+                        user_answer = False
+                    elif event.key == pygame.K_RIGHT:
+                        user_answer = True
+                        
                     is_correct = (user_answer == trial_di_test.expected_answer)
-                if event.key == pygame.K_RIGHT:
-                    user_answer = True
-                    is_correct = (user_answer == trial_di_test.expected_answer)
-                
-                count += 1 if is_correct else 0
-                score = apply_answer(score,is_correct)
-                trial_di_test = generate_trial(rng)
-                print(trial_di_test,count,score)
+                    count += 1 if is_correct else 0
+                    score = apply_answer(score,is_correct)
+                    
+                    feedback_color = (0, 255, 0) if is_correct else (255, 0, 0)
+                    feedback_until = current_time + 0.15
 
         screen.fill((0, 0, 0))
 
-        draw_card(screen, trial_di_test)
+        draw_card(screen, trial_di_test, feedback_color=feedback_color)
 
         # TIMER
         elapsed = time.time() - start_time
@@ -86,6 +99,8 @@ while running:
                     start_time = time.time()
 
                     trial_di_test = generate_trial(rng)
+                    feedback_until = 0
+                    feedback_color = None
 
                     state = "PLAYING"
 
