@@ -1,6 +1,6 @@
 import pygame
 
-def draw_card(surface, trial):
+def draw_card(surface, trial, feedback_color=None):
 
     card_width, card_height = 100, 140
 
@@ -14,8 +14,9 @@ def draw_card(surface, trial):
 
     card_rect = pygame.Rect(x, y, card_width, card_height)
 
+    bg_color = feedback_color if feedback_color else (255, 255, 255)
 
-    pygame.draw.rect(surface, (255, 255, 255), card_rect, border_radius=10)
+    pygame.draw.rect(surface, bg_color, card_rect, border_radius=10)
     pygame.draw.rect(surface, (0, 0, 0), card_rect, 2, border_radius=10)
 
 
