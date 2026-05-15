@@ -53,6 +53,13 @@ while running:
 
         screen.fill((0, 0, 0))
 
+        if count < 10:
+            rule_font = pygame.font.SysFont("arial", 24)
+            top_rule = rule_font.render("ALTO: Pari (Destra) o Dispari (Sinistra)", True, (150, 150, 150))
+            bottom_rule = rule_font.render("BASSO: Vocale (Destra) o Consonante (Sinistra)", True, (150, 150, 150))
+            screen.blit(top_rule, (WIDTH // 2 - top_rule.get_width() // 2, 40))
+            screen.blit(bottom_rule, (WIDTH // 2 - bottom_rule.get_width() // 2, HEIGHT - 80))
+
         draw_card(screen, trial_di_test, feedback_color=feedback_color)
 
         # TIMER
