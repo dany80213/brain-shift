@@ -16,8 +16,12 @@ class GameController:
             if event.type == pygame.QUIT:
                 self.state.running = False
             elif event.type == pygame.KEYDOWN:
-                if self.state.state == "PLAYING":
+                if self.state.state == "INTRO":
+                    self._handle_intro_key(event.key)
+                elif self.state.state == "PLAYING":
                     self._handle_playing_key(event.key)
+                elif self.state.state == "PAUSED":
+                    self._handle_paused_key(event.key)
                 elif self.state.state == "RESULTS":
                     self._handle_results_key(event.key)
 
@@ -26,13 +30,11 @@ class GameController:
             return
         current_time = time.time()
 
-        # Fase 1: il feedback colorato è scaduto, avvia l'inter-trial interval
         if self.state.feedback_color is not None and current_time >= self.state.feedback_until:
             self.state.feedback_color = None
             iti = random.uniform(config.ITI_MIN, config.ITI_MAX)
             self.state.trial_until = current_time + iti
 
-        # Fase 2: l'inter-trial interval è scaduto, genera il prossimo trial
         if self.state.feedback_color is None and self.state.trial_until > 0 and current_time >= self.state.trial_until:
             self.state.current_trial = generate_trial(self.state.rng)
             self.state.trial_until = 0
@@ -41,12 +43,24 @@ class GameController:
             self.state.score = apply_bonus(self.state.score, self.state.multiplier)
             self.state.state = "RESULTS"
 
+    def _handle_intro_key(self, key):
+        if key in (pygame.K_SPACE, pygame.K_RETURN):
+            self.state.start_time = time.time()
+            self.state.state = "PLAYING"
+
     def _handle_playing_key(self, key):
         current_time = time.time()
+
+        if key == pygame.K_p:
+            self.state.pause_start = current_time
+            self.state.state = "PAUSED"
+            return
+
         if current_time < self.state.feedback_until or self.state.trial_until > 0:
             return
         if key not in (pygame.K_LEFT, pygame.K_RIGHT):
             return
+
         user_answer = key == pygame.K_RIGHT
         is_correct = user_answer == self.state.current_trial.expected_answer
         self.state.attempts += 1
@@ -63,6 +77,17 @@ class GameController:
             )
         self.state.feedback_color = (50, 200, 90) if is_correct else (210, 55, 55)
         self.state.feedback_until = current_time + config.FEEDBACK_DURATION
+
+    def _handle_paused_key(self, key):
+        if key == pygame.K_p:
+            current_time = time.time()
+            pause_duration = current_time - self.state.pause_start
+            self.state.start_time += pause_duration
+            if self.state.feedback_until > 0:
+                self.state.feedback_until += pause_duration
+            if self.state.trial_until > 0:
+                self.state.trial_until += pause_duration
+            self.state.state = "PLAYING"
 
     def _handle_results_key(self, key):
         if key == pygame.K_r:

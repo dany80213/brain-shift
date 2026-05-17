@@ -3,7 +3,7 @@ import pygame
 import config
 from model.game_state import GameState
 from controller.game_controller import GameController
-from view.ui import draw_playing, draw_results
+from view.ui import draw_intro, draw_playing, draw_paused, draw_results
 
 
 def main():
@@ -21,8 +21,12 @@ def main():
         controller.handle_events(events)
         controller.update()
 
-        if state.state == "PLAYING":
+        if state.state == "INTRO":
+            draw_intro(screen)
+        elif state.state == "PLAYING":
             draw_playing(screen, state)
+        elif state.state == "PAUSED":
+            draw_paused(screen, state)
         elif state.state == "RESULTS":
             draw_results(screen, state)
 

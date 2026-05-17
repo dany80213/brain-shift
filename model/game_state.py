@@ -11,9 +11,10 @@ class GameState:
         self.multiplier = 1
         self.meter = 0
         self.hint_level = 0
-        self.state = "PLAYING"
+        self.state = "INTRO"
         self.running = True
-        self.start_time = time.time()
+        self.start_time = 0
+        self.pause_start = 0
         self.feedback_until = 0
         self.trial_until = 0
         self.feedback_color = None
@@ -26,8 +27,9 @@ class GameState:
         self.multiplier = 1
         self.meter = 0
         self.hint_level = 0
-        self.state = "PLAYING"
-        self.start_time = time.time()
+        self.state = "INTRO"
+        self.start_time = 0
+        self.pause_start = 0
         self.feedback_until = 0
         self.trial_until = 0
         self.feedback_color = None

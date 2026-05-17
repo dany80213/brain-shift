@@ -32,3 +32,8 @@ Thumbs.db
 # Environment variables
 .env
 .env.*
+
+# Docusaurus
+docs/node_modules/
+docs/build/
+docs/.docusaurus/

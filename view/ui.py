@@ -173,6 +173,64 @@ def draw_instructions(surface, hint_level):
     surface.blit(bottom_surf, (w // 2 - bottom_surf.get_width() // 2, h - 52))
 
 
+def draw_intro(surface):
+    w, h = surface.get_width(), surface.get_height()
+    surface.fill(BG_COLOR)
+
+    title_font   = pygame.font.SysFont("arial", 64, bold=True)
+    rule_font    = pygame.font.SysFont("arial", 22)
+    control_font = pygame.font.SysFont("arial", 20)
+    start_font   = pygame.font.SysFont("arial", 24, bold=True)
+
+    title_surf = title_font.render("Brain Shift", True, TEXT_MAIN)
+    surface.blit(title_surf, (w // 2 - title_surf.get_width() // 2, 80))
+
+    rules = [
+        "ALTO:   Pari → Destra   ·   Dispari → Sinistra",
+        "BASSO:  Vocale → Destra   ·   Consonante → Sinistra",
+    ]
+    for i, rule in enumerate(rules):
+        surf = rule_font.render(rule, True, TEXT_DIM)
+        surface.blit(surf, (w // 2 - surf.get_width() // 2, 210 + i * 38))
+
+    controls = [
+        "←  →   rispondi",
+        "P       pausa / riprendi",
+    ]
+    for i, ctrl in enumerate(controls):
+        surf = control_font.render(ctrl, True, TEXT_DIM)
+        surface.blit(surf, (w // 2 - surf.get_width() // 2, 340 + i * 32))
+
+    start_surf = start_font.render("Premi SPAZIO per iniziare", True, COLOR_CORRECT)
+    surface.blit(start_surf, (w // 2 - start_surf.get_width() // 2, 460))
+
+
+def draw_paused(surface, state: GameState):
+    w, h = surface.get_width(), surface.get_height()
+
+    # Draw the playing screen underneath, then overlay
+    elapsed_at_pause = state.pause_start - state.start_time
+    remaining_frozen = max(0, config.SESSION_DURATION - int(elapsed_at_pause))
+    draw_score_hud(surface, state.score)
+    draw_timer_hud(surface, remaining_frozen)
+    draw_meter_hud(surface, state.meter, state.multiplier)
+    draw_card(surface, state.current_trial)
+
+    overlay = pygame.Surface((w, h))
+    overlay.set_alpha(160)
+    overlay.fill((0, 0, 0))
+    surface.blit(overlay, (0, 0))
+
+    pause_font  = pygame.font.SysFont("arial", 56, bold=True)
+    hint_font   = pygame.font.SysFont("arial", 22)
+
+    pause_surf = pause_font.render("PAUSA", True, TEXT_MAIN)
+    hint_surf  = hint_font.render("Premi  P  per continuare", True, TEXT_DIM)
+
+    surface.blit(pause_surf, (w // 2 - pause_surf.get_width() // 2, h // 2 - 50))
+    surface.blit(hint_surf,  (w // 2 - hint_surf.get_width() // 2,  h // 2 + 30))
+
+
 def draw_playing(surface, state: GameState):
     surface.fill(BG_COLOR)
 
