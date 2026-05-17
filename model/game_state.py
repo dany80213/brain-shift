@@ -1,5 +1,5 @@
 import time
-from model.trial import Trial, generate_trial
+from model.trial import Trial, TrialGenerator
 
 
 class GameState:
@@ -18,7 +18,8 @@ class GameState:
         self.feedback_until = 0
         self.trial_until = 0
         self.feedback_color = None
-        self.current_trial: Trial = generate_trial(rng)
+        self.generator = TrialGenerator(rng)
+        self.current_trial: Trial = self.generator.generate()
 
     def reset(self):
         self.score = 0
@@ -33,4 +34,5 @@ class GameState:
         self.feedback_until = 0
         self.trial_until = 0
         self.feedback_color = None
-        self.current_trial = generate_trial(self.rng)
+        self.generator = TrialGenerator(self.rng)
+        self.current_trial = self.generator.generate()

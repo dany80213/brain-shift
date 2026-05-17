@@ -6,6 +6,7 @@ Questa cartella contiene i **test pytest forniti dal docente** per il laboratori
 
 - `test_rules.py` — verifica che `is_even`, `is_vowel` e `compute_expected_answer` si comportino correttamente
 - `test_scoring_base.py` — verifica che la versione lineare di `apply_answer` funzioni
+- `test_trial_generator.py` — verifica che il generatore eviti streak di posizione e bilanci YES/NO nel medio periodo
 - `conftest.py` — configurazione pytest per importare i vostri moduli
 
 ## Cosa dovete fare

@@ -3,7 +3,6 @@ import random
 import pygame
 import config
 from model.game_state import GameState
-from model.trial import generate_trial
 from model.scoring import apply_correct, apply_wrong, apply_bonus
 from view.ui import BUTTON_NO_RECT, BUTTON_YES_RECT
 
@@ -40,7 +39,7 @@ class GameController:
             self.state.trial_until = current_time + iti
 
         if self.state.feedback_color is None and self.state.trial_until > 0 and current_time >= self.state.trial_until:
-            self.state.current_trial = generate_trial(self.state.rng)
+            self.state.current_trial = self.state.generator.generate()
             self.state.trial_until = 0
 
         if current_time - self.state.start_time >= config.SESSION_DURATION:
