@@ -5,6 +5,11 @@ from model.game_state import GameState
 from model.trial import Trial
 
 
+
+BUTTON_NO_RECT  = pygame.Rect(60,  540, 140, 44)
+BUTTON_YES_RECT = pygame.Rect(600, 540, 140, 44)
+
+
 # ---------------------------------------------------------------------------
 # Colors
 # ---------------------------------------------------------------------------
@@ -170,7 +175,23 @@ def draw_instructions(surface, hint_level):
     bottom_surf.set_alpha(alpha)
 
     surface.blit(top_surf,    (w // 2 - top_surf.get_width() // 2, 92))
-    surface.blit(bottom_surf, (w // 2 - bottom_surf.get_width() // 2, h - 52))
+    surface.blit(bottom_surf, (w // 2 - bottom_surf.get_width() // 2, h - 100))
+
+
+def draw_answer_buttons(surface, active=True):
+    font = pygame.font.SysFont("arial", 22, bold=True)
+
+    for rect, label, base_color in (
+        (BUTTON_NO_RECT,  "← NO",  COLOR_WRONG),
+        (BUTTON_YES_RECT, "YES →", COLOR_CORRECT),
+    ):
+        bg    = base_color if active else HUD_BG
+        text  = TEXT_ON_COLORED if active else TEXT_DIM
+        pygame.draw.rect(surface, bg, rect, border_radius=8)
+        pygame.draw.rect(surface, HUD_BORDER, rect, 1, border_radius=8)
+        surf = font.render(label, True, text)
+        surface.blit(surf, (rect.centerx - surf.get_width() // 2,
+                            rect.centery - surf.get_height() // 2))
 
 
 def draw_intro(surface):
@@ -237,11 +258,17 @@ def draw_playing(surface, state: GameState):
     elapsed        = time.time() - state.start_time
     remaining_time = max(0, config.SESSION_DURATION - int(elapsed))
 
+    if state.feedback_color is None and state.trial_until == 0:
+        can_answer = True
+    else:
+        can_answer = False
+
     draw_score_hud(surface, state.score)
     draw_timer_hud(surface, remaining_time)
     draw_meter_hud(surface, state.meter, state.multiplier)
     draw_instructions(surface, state.hint_level)
     draw_card(surface, state.current_trial, feedback_color=state.feedback_color)
+    draw_answer_buttons(surface, active=can_answer)
 
 
 # ---------------------------------------------------------------------------

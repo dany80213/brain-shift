@@ -5,6 +5,7 @@ import config
 from model.game_state import GameState
 from model.trial import generate_trial
 from model.scoring import apply_correct, apply_wrong, apply_bonus
+from view.ui import BUTTON_NO_RECT, BUTTON_YES_RECT
 
 
 class GameController:
@@ -24,6 +25,9 @@ class GameController:
                     self._handle_paused_key(event.key)
                 elif self.state.state == "RESULTS":
                     self._handle_results_key(event.key)
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.state.state == "PLAYING":
+                    self._handle_mouse_click(event.pos)
 
     def update(self):
         if self.state.state != "PLAYING":
@@ -49,20 +53,26 @@ class GameController:
             self.state.state = "PLAYING"
 
     def _handle_playing_key(self, key):
-        current_time = time.time()
-
         if key == pygame.K_p:
-            self.state.pause_start = current_time
+            self.state.pause_start = time.time()
             self.state.state = "PAUSED"
             return
+        if key == pygame.K_LEFT:
+            self._process_answer(False)
+        elif key == pygame.K_RIGHT:
+            self._process_answer(True)
 
+    def _handle_mouse_click(self, pos):
+        if BUTTON_NO_RECT.collidepoint(pos):
+            self._process_answer(False)
+        elif BUTTON_YES_RECT.collidepoint(pos):
+            self._process_answer(True)
+
+    def _process_answer(self, is_yes: bool):
+        current_time = time.time()
         if current_time < self.state.feedback_until or self.state.trial_until > 0:
             return
-        if key not in (pygame.K_LEFT, pygame.K_RIGHT):
-            return
-
-        user_answer = key == pygame.K_RIGHT
-        is_correct = user_answer == self.state.current_trial.expected_answer
+        is_correct = is_yes == self.state.current_trial.expected_answer
         self.state.attempts += 1
         if is_correct:
             self.state.count += 1
