@@ -12,16 +12,18 @@ brain-shift/
 │   ├── game_state.py        # Stato mutabile (punteggio, moltiplicatore, meter, …)
 │   ├── trial.py             # Dataclass Trial e generatore
 │   ├── rules.py             # Logica di classificazione pura
-│   └── scoring.py           # Funzioni di scoring pure
+│   ├── scoring.py           # Funzioni di scoring pure
+│   └── leaderboard.py       # Persistenza top 5 punteggi (JSON)
 ├── controller/
 │   └── game_controller.py   # Gestione input, temporizzazione, transizioni di stato
 ├── view/
-│   └── ui.py                # Tutto il rendering Pygame
+│   ├── ui.py                # Tutto il rendering Pygame
+│   └── sounds.py            # Generazione effetti sonori
 └── tests/
     ├── test_rules.py
     ├── test_scoring_base.py
-    ├── test_trial_generator.py
     ├── test_scoring_advanced.py
+    ├── test_trial_generator.py
     └── conftest.py
 ```
 
@@ -46,6 +48,7 @@ Tutto lo stato di gioco è in `GameState`. Contiene solo dati, nessuna logica.
 | `best_streak` | int | Miglior serie consecutiva di risposte corrette |
 | `response_times` | list | Tempi di risposta registrati (in secondi) |
 | `final_bonus` | int | Bonus applicato a fine sessione |
+| `leaderboard` | list | Top 5 punteggi caricati a fine sessione |
 
 Funzioni di scoring pure in `model/scoring.py`:
 
@@ -125,7 +128,6 @@ L'input è bloccato durante entrambe le fasi.
 SEED = 48
 SESSION_DURATION = 60
 FEEDBACK_DURATION = 0.15
-INSTRUCTIONS_FADE_AFTER = 10
 ITI_MIN = 0.10
 ITI_MAX = 0.25
 ```

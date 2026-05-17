@@ -57,3 +57,5 @@ Ho (@dany80213) aggiunto scoring con meter e moltiplicatore, fading delle istruz
 Ho (@dany80213) migliorato il generatore delle carte: ora evita di mostrare troppe volte di fila la stessa posizione e bilancia le risposte giuste/sbagliate nel tempo, così la sessione è più equilibrata. Ho aggiunto anche dei test per verificare che funzioni.
 
 Ho (@MattePavons) aggiunto più metriche nella schermata risultati: moltiplicatore massimo raggiunto, moltiplicatore finale, tempo medio di risposta, best streak e bonus finale.
+
+Ho (@dany80213) aggiunto gli effetti sonori — un bip quando rispondi giusto, un suono più basso quando sbagli, e due note in salita quando sale il moltiplicatore. Ho anche aggiunto una classifica locale: i migliori 5 punteggi vengono salvati in un file JSON nella cartella del progetto e mostrati nella schermata risultati.

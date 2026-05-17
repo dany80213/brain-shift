@@ -4,12 +4,19 @@ import pygame
 import config
 from model.game_state import GameState
 from model.scoring import apply_correct, apply_wrong, apply_bonus
+from model.leaderboard import save_score
 from view.ui import BUTTON_NO_RECT, BUTTON_YES_RECT
 
 
 class GameController:
-    def __init__(self, state: GameState):
+    def __init__(self, state: GameState, sounds: dict = None):
         self.state = state
+        self._sounds = sounds or {}
+
+    def _play(self, name: str):
+        s = self._sounds.get(name)
+        if s:
+            s.play()
 
     def handle_events(self, events):
         for event in events:
@@ -46,6 +53,7 @@ class GameController:
         if current_time - self.state.start_time >= config.SESSION_DURATION:
             self.state.final_bonus = 250 * self.state.multiplier
             self.state.score = apply_bonus(self.state.score, self.state.multiplier)
+            self.state.leaderboard = save_score(self.state.score)
             self.state.state = "RESULTS"
 
     def _handle_intro_key(self, key):
@@ -84,18 +92,24 @@ class GameController:
         if is_correct:
             self.state.count += 1
             self.state.hint_level = min(self.state.hint_level + 1, 20)
+            prev_multiplier = self.state.multiplier
             self.state.score, self.state.multiplier, self.state.meter = apply_correct(
                 self.state.score, self.state.multiplier, self.state.meter
             )
             self.state.current_streak += 1
             self.state.best_streak = max(self.state.best_streak, self.state.current_streak)
             self.state.max_multiplier = max(self.state.max_multiplier, self.state.multiplier)
+            if self.state.multiplier > prev_multiplier:
+                self._play("level_up")
+            else:
+                self._play("correct")
         else:
             self.state.hint_level = max(self.state.hint_level - 1, 0)
             self.state.multiplier, self.state.meter = apply_wrong(
                 self.state.multiplier, self.state.meter
             )
             self.state.current_streak = 0
+            self._play("wrong")
 
         self.state.feedback_color = (50, 200, 90) if is_correct else (210, 55, 55)
         self.state.feedback_until = current_time + config.FEEDBACK_DURATION

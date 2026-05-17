@@ -4,17 +4,20 @@ import config
 from model.game_state import GameState
 from controller.game_controller import GameController
 from view.ui import draw_intro, draw_playing, draw_paused, draw_results
+from view.sounds import load_sounds
 
 
 def main():
+    pygame.mixer.pre_init(44100, -16, 2, 512)
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Brain Shift")
     clock = pygame.time.Clock()
 
+    sounds = load_sounds()
     rng = random.Random(config.SEED)
     state = GameState(rng=rng)
-    controller = GameController(state)
+    controller = GameController(state, sounds)
 
     while state.running:
         events = pygame.event.get()

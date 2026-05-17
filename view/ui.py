@@ -285,7 +285,7 @@ def draw_results(surface, state: GameState):
                 if state.response_times else 0)
 
     panel_w = 480
-    panel_h = 540
+    panel_h = 560
     panel_x = w // 2 - panel_w // 2
     panel_y = h // 2 - panel_h // 2
     draw_panel(surface, panel_x, panel_y, panel_w, panel_h)
@@ -294,6 +294,7 @@ def draw_results(surface, state: GameState):
     label_font = pygame.font.SysFont("arial", 17)
     value_font = pygame.font.SysFont("arial", 25, bold=True)
     hint_font  = pygame.font.SysFont("arial", 18)
+    lb_font    = pygame.font.SysFont("arial", 16)
 
     title_surf = title_font.render("RISULTATI", True, TEXT_MAIN)
     surface.blit(title_surf, (w // 2 - title_surf.get_width() // 2, panel_y + 18))
@@ -311,13 +312,13 @@ def draw_results(surface, state: GameState):
     ]
 
     row_start_y = panel_y + 68
-    row_height  = 46
+    row_height  = 40
 
     for index, (label_text, value_text, color) in enumerate(rows):
         row_y = row_start_y + index * row_height
 
         if index > 0:
-            sep_y = row_y - 8
+            sep_y = row_y - 6
             pygame.draw.line(
                 surface, SEPARATOR,
                 (panel_x + 20, sep_y),
@@ -330,5 +331,20 @@ def draw_results(surface, state: GameState):
         surface.blit(label_surf, (panel_x + 28, row_y))
         surface.blit(value_surf, (panel_x + panel_w - 28 - value_surf.get_width(), row_y))
 
+    # Leaderboard section
+    lb_y = row_start_y + 9 * row_height + 10
+    pygame.draw.line(surface, SEPARATOR, (panel_x + 20, lb_y), (panel_x + panel_w - 20, lb_y))
+    lb_y += 10
+
+    lb_label = lb_font.render("CLASSIFICA", True, TEXT_DIM)
+    surface.blit(lb_label, (panel_x + 28, lb_y))
+
+    if state.leaderboard:
+        scores_str = "  ·  ".join(str(s) for s in state.leaderboard)
+    else:
+        scores_str = "—"
+    lb_scores = lb_font.render(scores_str, True, (255, 200, 70))
+    surface.blit(lb_scores, (panel_x + panel_w - 28 - lb_scores.get_width(), lb_y))
+
     hint_surf = hint_font.render("Premi  R  per rigiocare", True, TEXT_DIM)
-    surface.blit(hint_surf, (w // 2 - hint_surf.get_width() // 2, panel_y + panel_h - 36))
+    surface.blit(hint_surf, (w // 2 - hint_surf.get_width() // 2, panel_y + panel_h - 32))

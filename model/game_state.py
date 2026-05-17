@@ -24,6 +24,7 @@ class GameState:
         self.response_times = []
         self.trial_start_time = 0
         self.final_bonus = 0
+        self.leaderboard = []
         self.generator = TrialGenerator(rng)
         self.current_trial: Trial = self.generator.generate()
 
@@ -46,5 +47,6 @@ class GameState:
         self.response_times = []
         self.trial_start_time = 0
         self.final_bonus = 0
+        self.leaderboard = []
         self.generator = TrialGenerator(self.rng)
         self.current_trial = self.generator.generate()
