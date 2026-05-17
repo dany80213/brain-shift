@@ -55,3 +55,5 @@ Ho (@dany80213) aggiunto scoring con meter e moltiplicatore, fading delle istruz
 @alessandro-guttadauro ha aggiunto i pulsanti YES/NO cliccabili — adesso si può rispondere anche col mouse oltre che con la tastiera.
 
 Ho (@dany80213) migliorato il generatore delle carte: ora evita di mostrare troppe volte di fila la stessa posizione e bilancia le risposte giuste/sbagliate nel tempo, così la sessione è più equilibrata. Ho aggiunto anche dei test per verificare che funzioni.
+
+Ho (@MattePavons) aggiunto più metriche nella schermata risultati: moltiplicatore massimo raggiunto, moltiplicatore finale, tempo medio di risposta, best streak e bonus finale.
