@@ -11,7 +11,7 @@ Per lanciarli: pytest tests/test_rules.py
 import pytest
 
 try:
-    from rules import is_even, is_vowel, compute_expected_answer
+    from model.rules import is_even, is_vowel, compute_expected_answer
 except ImportError:
     is_even = None
     is_vowel = None
@@ -19,15 +19,15 @@ except ImportError:
 
 
 def test_structure_check():
-    """Verifica che il file rules.py esista e contenga le funzioni attese."""
+    """Verifica che model/rules.py esista e contenga le funzioni attese."""
     assert is_even is not None, (
-        "Non trovo 'is_even' in 'rules.py'. "
-        "Controlla che il file si chiami esattamente 'rules.py' "
+        "Non trovo 'is_even' in 'model/rules.py'. "
+        "Controlla che il file si chiami esattamente 'model/rules.py' "
         "e contenga una funzione 'is_even'."
     )
-    assert is_vowel is not None, "Manca la funzione 'is_vowel' in 'rules.py'."
+    assert is_vowel is not None, "Manca la funzione 'is_vowel' in 'model/rules.py'."
     assert compute_expected_answer is not None, (
-        "Manca la funzione 'compute_expected_answer' in 'rules.py'."
+        "Manca la funzione 'compute_expected_answer' in 'model/rules.py'."
     )
 
 

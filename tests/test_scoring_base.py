@@ -21,16 +21,16 @@ Per lanciarli: pytest tests/test_scoring_base.py
 import pytest
 
 try:
-    from scoring import apply_answer
+    from model.scoring import apply_answer
 except ImportError:
     apply_answer = None
 
 
 def test_structure_check():
-    """Verifica che scoring.py esista e contenga apply_answer."""
+    """Verifica che model/scoring.py esista e contenga apply_answer."""
     assert apply_answer is not None, (
-        "Non trovo 'apply_answer' in 'scoring.py'. "
-        "Controlla che il file si chiami esattamente 'scoring.py' "
+        "Non trovo 'apply_answer' in 'model/scoring.py'. "
+        "Controlla che il file si chiami esattamente 'model/scoring.py' "
         "e contenga una funzione 'apply_answer(score, is_correct)'."
     )
 
