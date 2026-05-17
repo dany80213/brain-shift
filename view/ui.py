@@ -5,7 +5,7 @@ from model.game_state import GameState
 from model.trial import Trial
 
 
-
+# Rettangoli dei pulsanti NO e YES in basso a sinistra e destra
 BUTTON_NO_RECT  = pygame.Rect(60,  540, 140, 44)
 BUTTON_YES_RECT = pygame.Rect(600, 540, 140, 44)
 
@@ -37,12 +37,14 @@ SEPARATOR       = (42, 42, 68)
 # ---------------------------------------------------------------------------
 
 def draw_hud_box(surface, x, y, w, h):
+    # Sfondo scuro con bordo sottile, usato per score e timer
     rect = pygame.Rect(x, y, w, h)
     pygame.draw.rect(surface, HUD_BG, rect, border_radius=8)
     pygame.draw.rect(surface, HUD_BORDER, rect, 1, border_radius=8)
 
 
 def draw_panel(surface, x, y, w, h):
+    # Pannello più grande usato per la schermata risultati
     rect = pygame.Rect(x, y, w, h)
     pygame.draw.rect(surface, (22, 22, 38), rect, border_radius=16)
     pygame.draw.rect(surface, (62, 62, 92), rect, 2, border_radius=16)
@@ -58,6 +60,7 @@ def draw_card(surface, trial: Trial, feedback_color=None):
     cx = surface.get_width() // 2
     card_x = cx - card_w // 2
 
+    # La card appare in alto o in basso a seconda della posizione del trial
     if trial.position == "TOP":
         card_y = 130
     else:
@@ -65,16 +68,16 @@ def draw_card(surface, trial: Trial, feedback_color=None):
 
     card_rect = pygame.Rect(card_x, card_y, card_w, card_h)
 
-    # Shadow (offset rect drawn first, behind the card)
+    # Ombra: rettangolo identico spostato di 5px in basso a destra, disegnato prima
     shadow_rect = pygame.Rect(card_x + 5, card_y + 5, card_w, card_h)
     pygame.draw.rect(surface, CARD_SHADOW, shadow_rect, border_radius=12)
 
-    # Card body
+    # Corpo della card: bianco di default, colorato durante il feedback
     bg_color = feedback_color if feedback_color else CARD_BG
     pygame.draw.rect(surface, bg_color, card_rect, border_radius=12)
     pygame.draw.rect(surface, CARD_BORDER, card_rect, 2, border_radius=12)
 
-    # Text: white on colored feedback, dark on white card
+    # Testo bianco sul feedback colorato, scuro sulla card bianca
     text_color = TEXT_ON_COLORED if feedback_color else TEXT_ON_CARD
 
     letter_font = pygame.font.SysFont("arial", 52, bold=True)
@@ -83,6 +86,7 @@ def draw_card(surface, trial: Trial, feedback_color=None):
     letter_surf = letter_font.render(str(trial.letter), True, text_color)
     number_surf = number_font.render(str(trial.number), True, text_color)
 
+    # Centra lettera e numero orizzontalmente nella card
     letter_x = card_x + card_w // 2 - letter_surf.get_width() // 2
     number_x = card_x + card_w // 2 - number_surf.get_width() // 2
 
@@ -91,6 +95,7 @@ def draw_card(surface, trial: Trial, feedback_color=None):
 
 
 def draw_score_hud(surface, score):
+    # Box score in alto a sinistra
     draw_hud_box(surface, 20, 16, 90, 64)
 
     label_font = pygame.font.SysFont("arial", 17)
@@ -99,29 +104,32 @@ def draw_score_hud(surface, score):
     label_surf = label_font.render("SCORE", True, TEXT_DIM)
     value_surf = value_font.render(str(score), True, COLOR_SCORE)
 
+    # cx è il centro del box (x=20, larghezza=90 → centro a 65)
     cx = 20 + 45
     surface.blit(label_surf, (cx - label_surf.get_width() // 2, 22))
     surface.blit(value_surf, (cx - value_surf.get_width() // 2, 42))
 
 
 def draw_meter_hud(surface, meter, multiplier):
+    # 4 pallini centrati in alto: si riempiono verso il prossimo moltiplicatore
     cx = surface.get_width() // 2
 
-    # 4 dots for the meter
     dot_radius = 8
     dot_spacing = 26
-    total_width = 3 * dot_spacing
+    total_width = 3 * dot_spacing  # distanza tra il primo e l'ultimo centro
     start_x = cx - total_width // 2
 
     for i in range(4):
         x = start_x + i * dot_spacing
         if i < meter:
+            # Pallino pieno = barra guadagnata
             pygame.draw.circle(surface, COLOR_CORRECT, (x, 32), dot_radius)
         else:
+            # Pallino vuoto con sfondo scuro per sembrare "cavo"
             pygame.draw.circle(surface, HUD_BORDER, (x, 32), dot_radius)
             pygame.draw.circle(surface, HUD_BG, (x, 32), dot_radius - 2)
 
-    # Multiplier label below the dots
+    # Etichetta del moltiplicatore attivo sotto i pallini
     multi_color = COLOR_SCORE if multiplier == 1 else (255, 200, 70)
     multi_font = pygame.font.SysFont("arial", 18, bold=True)
     multi_surf = multi_font.render(f"x{multiplier}", True, multi_color)
@@ -129,6 +137,7 @@ def draw_meter_hud(surface, meter, multiplier):
 
 
 def draw_timer_hud(surface, remaining):
+    # Box timer in alto a destra
     w = surface.get_width()
     box_x = w - 110
     draw_hud_box(surface, box_x, 16, 90, 64)
@@ -136,6 +145,7 @@ def draw_timer_hud(surface, remaining):
     label_font = pygame.font.SysFont("arial", 17)
     value_font = pygame.font.SysFont("arial", 28, bold=True)
 
+    # Diventa rosso sotto i 10 secondi per avvisare il giocatore
     timer_color = COLOR_TIMER_LOW if remaining <= 10 else COLOR_TIMER_OK
 
     label_surf = label_font.render("TIME", True, TEXT_DIM)
@@ -147,14 +157,16 @@ def draw_timer_hud(surface, remaining):
 
 
 def _instruction_alpha(hint_level):
+    # Le istruzioni partono opache e si affievoliscono progressivamente
+    # man mano che il giocatore risponde, fino a sparire completamente
     if hint_level <= 3:
-        return 255
+        return 255   # completamente visibili
     elif hint_level <= 7:
-        return 178
+        return 178   # leggermente trasparenti
     elif hint_level <= 11:
-        return 102
+        return 102   # molto trasparenti
     else:
-        return 0
+        return 0     # invisibili: il giocatore non ha più bisogno dell'aiuto
 
 
 def draw_instructions(surface, hint_level):
@@ -174,11 +186,13 @@ def draw_instructions(surface, hint_level):
     top_surf.set_alpha(alpha)
     bottom_surf.set_alpha(alpha)
 
+    # Ogni istruzione è posizionata appena sopra la rispettiva zona della card
     surface.blit(top_surf,    (w // 2 - top_surf.get_width() // 2, 92))
-    surface.blit(bottom_surf, (w // 2 - bottom_surf.get_width() // 2, h - 100))
+    surface.blit(bottom_surf, (w // 2 - bottom_surf.get_width() // 2, 322))
 
 
 def draw_answer_buttons(surface, active=True):
+    # Quando active=False (durante feedback o ITI) i pulsanti diventano grigi
     font = pygame.font.SysFont("arial", 22, bold=True)
 
     for rect, label, base_color in (
@@ -203,9 +217,11 @@ def draw_intro(surface):
     control_font = pygame.font.SysFont("arial", 20)
     start_font   = pygame.font.SysFont("arial", 24, bold=True)
 
+    # Titolo centrato in alto
     title_surf = title_font.render("Brain Shift", True, TEXT_MAIN)
     surface.blit(title_surf, (w // 2 - title_surf.get_width() // 2, 80))
 
+    # Regole del gioco: una per posizione card
     rules = [
         "ALTO:   Pari → Destra   ·   Dispari → Sinistra",
         "BASSO:  Vocale → Destra   ·   Consonante → Sinistra",
@@ -214,6 +230,7 @@ def draw_intro(surface):
         surf = rule_font.render(rule, True, TEXT_DIM)
         surface.blit(surf, (w // 2 - surf.get_width() // 2, 210 + i * 38))
 
+    # Controlli
     controls = [
         "←  →   rispondi",
         "P       pausa / riprendi",
@@ -229,7 +246,7 @@ def draw_intro(surface):
 def draw_paused(surface, state: GameState):
     w, h = surface.get_width(), surface.get_height()
 
-    # Draw the playing screen underneath, then overlay
+    # Disegna prima lo schermo di gioco congelato al momento della pausa
     elapsed_at_pause = state.pause_start - state.start_time
     remaining_frozen = max(0, config.SESSION_DURATION - int(elapsed_at_pause))
     draw_score_hud(surface, state.score)
@@ -237,6 +254,7 @@ def draw_paused(surface, state: GameState):
     draw_meter_hud(surface, state.meter, state.multiplier)
     draw_card(surface, state.current_trial)
 
+    # Overlay nero semitrasparente per scurire lo sfondo senza cancellarlo
     overlay = pygame.Surface((w, h))
     overlay.set_alpha(160)
     overlay.fill((0, 0, 0))
@@ -258,6 +276,7 @@ def draw_playing(surface, state: GameState):
     elapsed        = time.time() - state.start_time
     remaining_time = max(0, config.SESSION_DURATION - int(elapsed))
 
+    # I pulsanti si disattivano durante il feedback visivo e l'inter-trial interval
     if state.feedback_color is None and state.trial_until == 0:
         can_answer = True
     else:
@@ -284,8 +303,9 @@ def draw_results(surface, state: GameState):
     avg_time = (sum(state.response_times) / len(state.response_times)
                 if state.response_times else 0)
 
+    # Pannello centrale che contiene tutte le statistiche
     panel_w = 480
-    panel_h = 540
+    panel_h = 560
     panel_x = w // 2 - panel_w // 2
     panel_y = h // 2 - panel_h // 2
     draw_panel(surface, panel_x, panel_y, panel_w, panel_h)
@@ -294,10 +314,12 @@ def draw_results(surface, state: GameState):
     label_font = pygame.font.SysFont("arial", 17)
     value_font = pygame.font.SysFont("arial", 25, bold=True)
     hint_font  = pygame.font.SysFont("arial", 18)
+    lb_font    = pygame.font.SysFont("arial", 16)
 
     title_surf = title_font.render("RISULTATI", True, TEXT_MAIN)
     surface.blit(title_surf, (w // 2 - title_surf.get_width() // 2, panel_y + 18))
 
+    # Ogni riga: (etichetta, valore, colore del valore)
     rows = [
         ("Punteggio",      str(state.score),              COLOR_SCORE),
         ("Corrette",       str(state.count),               COLOR_CORRECT),
@@ -311,13 +333,14 @@ def draw_results(surface, state: GameState):
     ]
 
     row_start_y = panel_y + 68
-    row_height  = 46
+    row_height  = 40
 
     for index, (label_text, value_text, color) in enumerate(rows):
         row_y = row_start_y + index * row_height
 
+        # Riga separatrice tra le voci (non prima della prima)
         if index > 0:
-            sep_y = row_y - 8
+            sep_y = row_y - 6
             pygame.draw.line(
                 surface, SEPARATOR,
                 (panel_x + 20, sep_y),
@@ -327,8 +350,24 @@ def draw_results(surface, state: GameState):
         label_surf = label_font.render(label_text, True, TEXT_DIM)
         value_surf = value_font.render(value_text, True, color)
 
+        # Etichetta a sinistra, valore allineato a destra
         surface.blit(label_surf, (panel_x + 28, row_y))
         surface.blit(value_surf, (panel_x + panel_w - 28 - value_surf.get_width(), row_y))
 
+    # Sezione classifica in fondo al pannello
+    lb_y = row_start_y + 9 * row_height + 10
+    pygame.draw.line(surface, SEPARATOR, (panel_x + 20, lb_y), (panel_x + panel_w - 20, lb_y))
+    lb_y += 10
+
+    lb_label = lb_font.render("CLASSIFICA", True, TEXT_DIM)
+    surface.blit(lb_label, (panel_x + 28, lb_y))
+
+    if state.leaderboard:
+        scores_str = "  ·  ".join(str(s) for s in state.leaderboard)
+    else:
+        scores_str = "—"
+    lb_scores = lb_font.render(scores_str, True, (255, 200, 70))
+    surface.blit(lb_scores, (panel_x + panel_w - 28 - lb_scores.get_width(), lb_y))
+
     hint_surf = hint_font.render("Premi  R  per rigiocare", True, TEXT_DIM)
-    surface.blit(hint_surf, (w // 2 - hint_surf.get_width() // 2, panel_y + panel_h - 36))
+    surface.blit(hint_surf, (w // 2 - hint_surf.get_width() // 2, panel_y + panel_h - 32))

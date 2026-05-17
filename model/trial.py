@@ -36,21 +36,34 @@ class TrialGenerator:
         return Trial(position=position, letter=letter, number=number, expected_answer=answer)
 
     def _pick_position(self) -> str:
-        if (len(self._positions) >= MAX_STREAK
-                and len(set(self._positions[-MAX_STREAK:])) == 1):
-            options = [p for p in ("TOP", "BOTTOM") if p != self._positions[-1]]
-        else:
-            options = ["TOP", "BOTTOM"]
-        return self.rng.choice(options)
+        # Se la stessa posizione si ripete MAX_STREAK volte di fila,
+        # forza l'altra per evitare sequenze monotone
+        if len(self._positions) >= MAX_STREAK:
+            ultime = self._positions[-MAX_STREAK:]
+            if len(set(ultime)) == 1:
+                ultima = self._positions[-1]
+                if ultima == "TOP":
+                    return "BOTTOM"
+                else:
+                    return "TOP"
+        # Nessuno streak: scegli a caso
+        return self.rng.choice(["TOP", "BOTTOM"])
 
     def _target_answer(self):
+        # Non abbastanza storico per valutare lo sbilanciamento
         if len(self._answers) < BALANCE_WINDOW:
             return None
-        yes_ratio = sum(self._answers[-BALANCE_WINDOW:]) / BALANCE_WINDOW
-        if yes_ratio > 0.65:
+
+        ultime_risposte = self._answers[-BALANCE_WINDOW:]
+        percentuale_yes = sum(ultime_risposte) / BALANCE_WINDOW
+
+        # Troppi YES di fila: forza un NO
+        if percentuale_yes > 0.65:
             return False
-        if yes_ratio < 0.35:
+        # Troppi NO di fila: forza un YES
+        if percentuale_yes < 0.35:
             return True
+        # Bilanciato: nessun forzamento
         return None
 
     def _pick_card(self, position: str, want_yes):
