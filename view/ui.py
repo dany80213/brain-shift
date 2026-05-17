@@ -99,6 +99,30 @@ def draw_score_hud(surface, score):
     surface.blit(value_surf, (cx - value_surf.get_width() // 2, 42))
 
 
+def draw_meter_hud(surface, meter, multiplier):
+    cx = surface.get_width() // 2
+
+    # 4 dots for the meter
+    dot_radius = 8
+    dot_spacing = 26
+    total_width = 3 * dot_spacing
+    start_x = cx - total_width // 2
+
+    for i in range(4):
+        x = start_x + i * dot_spacing
+        if i < meter:
+            pygame.draw.circle(surface, COLOR_CORRECT, (x, 32), dot_radius)
+        else:
+            pygame.draw.circle(surface, HUD_BORDER, (x, 32), dot_radius)
+            pygame.draw.circle(surface, HUD_BG, (x, 32), dot_radius - 2)
+
+    # Multiplier label below the dots
+    multi_color = COLOR_SCORE if multiplier == 1 else (255, 200, 70)
+    multi_font = pygame.font.SysFont("arial", 18, bold=True)
+    multi_surf = multi_font.render(f"x{multiplier}", True, multi_color)
+    surface.blit(multi_surf, (cx - multi_surf.get_width() // 2, 48))
+
+
 def draw_timer_hud(surface, remaining):
     w = surface.get_width()
     box_x = w - 110
@@ -144,6 +168,7 @@ def draw_playing(surface, state: GameState):
 
     draw_score_hud(surface, state.score)
     draw_timer_hud(surface, remaining_time)
+    draw_meter_hud(surface, state.meter, state.multiplier)
     draw_instructions(surface, state.count)
     draw_card(surface, state.current_trial, feedback_color=state.feedback_color)
 

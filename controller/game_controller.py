@@ -3,7 +3,7 @@ import pygame
 import config
 from model.game_state import GameState
 from model.trial import generate_trial
-from model.scoring import apply_answer
+from model.scoring import apply_correct, apply_wrong, apply_bonus
 
 
 class GameController:
@@ -28,6 +28,7 @@ class GameController:
             self.state.current_trial = generate_trial(self.state.rng)
             self.state.feedback_color = None
         if current_time - self.state.start_time >= config.SESSION_DURATION:
+            self.state.score = apply_bonus(self.state.score, self.state.multiplier)
             self.state.state = "RESULTS"
 
     def _handle_playing_key(self, key):
@@ -39,8 +40,15 @@ class GameController:
         user_answer = key == pygame.K_RIGHT
         is_correct = user_answer == self.state.current_trial.expected_answer
         self.state.attempts += 1
-        self.state.count += 1 if is_correct else 0
-        self.state.score = apply_answer(self.state.score, is_correct)
+        if is_correct:
+            self.state.count += 1
+            self.state.score, self.state.multiplier, self.state.meter = apply_correct(
+                self.state.score, self.state.multiplier, self.state.meter
+            )
+        else:
+            self.state.multiplier, self.state.meter = apply_wrong(
+                self.state.multiplier, self.state.meter
+            )
         self.state.feedback_color = (50, 200, 90) if is_correct else (210, 55, 55)
         self.state.feedback_until = current_time + config.FEEDBACK_DURATION
 

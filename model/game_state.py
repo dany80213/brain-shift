@@ -8,6 +8,8 @@ class GameState:
         self.score = 0
         self.count = 0
         self.attempts = 0
+        self.multiplier = 1
+        self.meter = 0
         self.state = "PLAYING"
         self.running = True
         self.start_time = time.time()
@@ -19,6 +21,8 @@ class GameState:
         self.score = 0
         self.count = 0
         self.attempts = 0
+        self.multiplier = 1
+        self.meter = 0
         self.state = "PLAYING"
         self.start_time = time.time()
         self.feedback_until = 0
