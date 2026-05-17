@@ -1,4 +1,5 @@
 import time
+import random
 import pygame
 import config
 from model.game_state import GameState
@@ -24,16 +25,25 @@ class GameController:
         if self.state.state != "PLAYING":
             return
         current_time = time.time()
+
+        # Fase 1: il feedback colorato è scaduto, avvia l'inter-trial interval
         if self.state.feedback_color is not None and current_time >= self.state.feedback_until:
-            self.state.current_trial = generate_trial(self.state.rng)
             self.state.feedback_color = None
+            iti = random.uniform(config.ITI_MIN, config.ITI_MAX)
+            self.state.trial_until = current_time + iti
+
+        # Fase 2: l'inter-trial interval è scaduto, genera il prossimo trial
+        if self.state.feedback_color is None and self.state.trial_until > 0 and current_time >= self.state.trial_until:
+            self.state.current_trial = generate_trial(self.state.rng)
+            self.state.trial_until = 0
+
         if current_time - self.state.start_time >= config.SESSION_DURATION:
             self.state.score = apply_bonus(self.state.score, self.state.multiplier)
             self.state.state = "RESULTS"
 
     def _handle_playing_key(self, key):
         current_time = time.time()
-        if current_time < self.state.feedback_until:
+        if current_time < self.state.feedback_until or self.state.trial_until > 0:
             return
         if key not in (pygame.K_LEFT, pygame.K_RIGHT):
             return
@@ -42,10 +52,12 @@ class GameController:
         self.state.attempts += 1
         if is_correct:
             self.state.count += 1
+            self.state.hint_level = min(self.state.hint_level + 1, 20)
             self.state.score, self.state.multiplier, self.state.meter = apply_correct(
                 self.state.score, self.state.multiplier, self.state.meter
             )
         else:
+            self.state.hint_level = max(self.state.hint_level - 1, 0)
             self.state.multiplier, self.state.meter = apply_wrong(
                 self.state.multiplier, self.state.meter
             )

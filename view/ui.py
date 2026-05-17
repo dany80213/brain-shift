@@ -141,8 +141,20 @@ def draw_timer_hud(surface, remaining):
     surface.blit(value_surf, (cx - value_surf.get_width() // 2, 42))
 
 
-def draw_instructions(surface, count):
-    if count >= config.INSTRUCTIONS_FADE_AFTER:
+def _instruction_alpha(hint_level):
+    if hint_level <= 3:
+        return 255
+    elif hint_level <= 7:
+        return 178
+    elif hint_level <= 11:
+        return 102
+    else:
+        return 0
+
+
+def draw_instructions(surface, hint_level):
+    alpha = _instruction_alpha(hint_level)
+    if alpha == 0:
         return
 
     w, h = surface.get_width(), surface.get_height()
@@ -154,9 +166,10 @@ def draw_instructions(surface, count):
     top_surf    = font.render(top_text, True, TEXT_DIM)
     bottom_surf = font.render(bottom_text, True, TEXT_DIM)
 
-    # Top rule sits just below the HUD boxes (which end at y=80)
+    top_surf.set_alpha(alpha)
+    bottom_surf.set_alpha(alpha)
+
     surface.blit(top_surf,    (w // 2 - top_surf.get_width() // 2, 92))
-    # Bottom rule sits near the bottom edge
     surface.blit(bottom_surf, (w // 2 - bottom_surf.get_width() // 2, h - 52))
 
 
@@ -169,7 +182,7 @@ def draw_playing(surface, state: GameState):
     draw_score_hud(surface, state.score)
     draw_timer_hud(surface, remaining_time)
     draw_meter_hud(surface, state.meter, state.multiplier)
-    draw_instructions(surface, state.count)
+    draw_instructions(surface, state.hint_level)
     draw_card(surface, state.current_trial, feedback_color=state.feedback_color)
 
 
