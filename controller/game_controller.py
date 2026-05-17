@@ -40,15 +40,18 @@ class GameController:
 
         if self.state.feedback_color is None and self.state.trial_until > 0 and current_time >= self.state.trial_until:
             self.state.current_trial = self.state.generator.generate()
+            self.state.trial_start_time = current_time
             self.state.trial_until = 0
 
         if current_time - self.state.start_time >= config.SESSION_DURATION:
+            self.state.final_bonus = 250 * self.state.multiplier
             self.state.score = apply_bonus(self.state.score, self.state.multiplier)
             self.state.state = "RESULTS"
 
     def _handle_intro_key(self, key):
         if key in (pygame.K_SPACE, pygame.K_RETURN):
             self.state.start_time = time.time()
+            self.state.trial_start_time = time.time()
             self.state.state = "PLAYING"
 
     def _handle_playing_key(self, key):
@@ -71,6 +74,11 @@ class GameController:
         current_time = time.time()
         if current_time < self.state.feedback_until or self.state.trial_until > 0:
             return
+
+        if self.state.trial_start_time > 0:
+            self.state.response_times.append(current_time - self.state.trial_start_time)
+            self.state.trial_start_time = 0
+
         is_correct = is_yes == self.state.current_trial.expected_answer
         self.state.attempts += 1
         if is_correct:
@@ -79,11 +87,16 @@ class GameController:
             self.state.score, self.state.multiplier, self.state.meter = apply_correct(
                 self.state.score, self.state.multiplier, self.state.meter
             )
+            self.state.current_streak += 1
+            self.state.best_streak = max(self.state.best_streak, self.state.current_streak)
+            self.state.max_multiplier = max(self.state.max_multiplier, self.state.multiplier)
         else:
             self.state.hint_level = max(self.state.hint_level - 1, 0)
             self.state.multiplier, self.state.meter = apply_wrong(
                 self.state.multiplier, self.state.meter
             )
+            self.state.current_streak = 0
+
         self.state.feedback_color = (50, 200, 90) if is_correct else (210, 55, 55)
         self.state.feedback_until = current_time + config.FEEDBACK_DURATION
 
@@ -96,6 +109,8 @@ class GameController:
                 self.state.feedback_until += pause_duration
             if self.state.trial_until > 0:
                 self.state.trial_until += pause_duration
+            if self.state.trial_start_time > 0:
+                self.state.trial_start_time += pause_duration
             self.state.state = "PLAYING"
 
     def _handle_results_key(self, key):

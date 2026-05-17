@@ -281,36 +281,43 @@ def draw_results(surface, state: GameState):
 
     wrong    = state.attempts - state.count
     accuracy = int((state.count / state.attempts) * 100) if state.attempts > 0 else 0
+    avg_time = (sum(state.response_times) / len(state.response_times)
+                if state.response_times else 0)
 
-    panel_w = 420
-    panel_h = 440
+    panel_w = 480
+    panel_h = 540
     panel_x = w // 2 - panel_w // 2
     panel_y = h // 2 - panel_h // 2
     draw_panel(surface, panel_x, panel_y, panel_w, panel_h)
 
-    title_font = pygame.font.SysFont("arial", 44, bold=True)
-    label_font = pygame.font.SysFont("arial", 20)
-    value_font = pygame.font.SysFont("arial", 32, bold=True)
-    hint_font  = pygame.font.SysFont("arial", 19)
+    title_font = pygame.font.SysFont("arial", 40, bold=True)
+    label_font = pygame.font.SysFont("arial", 17)
+    value_font = pygame.font.SysFont("arial", 25, bold=True)
+    hint_font  = pygame.font.SysFont("arial", 18)
 
     title_surf = title_font.render("RISULTATI", True, TEXT_MAIN)
-    surface.blit(title_surf, (w // 2 - title_surf.get_width() // 2, panel_y + 22))
+    surface.blit(title_surf, (w // 2 - title_surf.get_width() // 2, panel_y + 18))
 
     rows = [
-        ("Punteggio",   str(state.score), COLOR_SCORE),
-        ("Corrette",    str(state.count), COLOR_CORRECT),
-        ("Errate",      str(wrong),       COLOR_WRONG),
-        ("Accuratezza", f"{accuracy}%",   COLOR_ACCURACY),
+        ("Punteggio",      str(state.score),              COLOR_SCORE),
+        ("Corrette",       str(state.count),               COLOR_CORRECT),
+        ("Errate",         str(wrong),                     COLOR_WRONG),
+        ("Accuratezza",    f"{accuracy}%",                 COLOR_ACCURACY),
+        ("Bonus finale",   f"+{state.final_bonus}",        COLOR_SCORE),
+        ("Mult. massimo",  f"x{state.max_multiplier}",     (255, 200, 70)),
+        ("Mult. finale",   f"x{state.multiplier}",         (255, 200, 70)),
+        ("Best streak",    str(state.best_streak),         COLOR_CORRECT),
+        ("Tempo medio",    f"{avg_time:.1f}s",             COLOR_TIMER_OK),
     ]
 
-    row_start_y = panel_y + 108
-    row_height  = 72
+    row_start_y = panel_y + 68
+    row_height  = 46
 
     for index, (label_text, value_text, color) in enumerate(rows):
         row_y = row_start_y + index * row_height
 
         if index > 0:
-            sep_y = row_y - 10
+            sep_y = row_y - 8
             pygame.draw.line(
                 surface, SEPARATOR,
                 (panel_x + 20, sep_y),
@@ -320,8 +327,8 @@ def draw_results(surface, state: GameState):
         label_surf = label_font.render(label_text, True, TEXT_DIM)
         value_surf = value_font.render(value_text, True, color)
 
-        surface.blit(label_surf, (panel_x + 30, row_y))
-        surface.blit(value_surf, (panel_x + panel_w - 30 - value_surf.get_width(), row_y))
+        surface.blit(label_surf, (panel_x + 28, row_y))
+        surface.blit(value_surf, (panel_x + panel_w - 28 - value_surf.get_width(), row_y))
 
     hint_surf = hint_font.render("Premi  R  per rigiocare", True, TEXT_DIM)
-    surface.blit(hint_surf, (w // 2 - hint_surf.get_width() // 2, panel_y + panel_h - 40))
+    surface.blit(hint_surf, (w // 2 - hint_surf.get_width() // 2, panel_y + panel_h - 36))

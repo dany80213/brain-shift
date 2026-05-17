@@ -18,6 +18,12 @@ class GameState:
         self.feedback_until = 0
         self.trial_until = 0
         self.feedback_color = None
+        self.max_multiplier = 1
+        self.best_streak = 0
+        self.current_streak = 0
+        self.response_times = []
+        self.trial_start_time = 0
+        self.final_bonus = 0
         self.generator = TrialGenerator(rng)
         self.current_trial: Trial = self.generator.generate()
 
@@ -34,5 +40,11 @@ class GameState:
         self.feedback_until = 0
         self.trial_until = 0
         self.feedback_color = None
+        self.max_multiplier = 1
+        self.best_streak = 0
+        self.current_streak = 0
+        self.response_times = []
+        self.trial_start_time = 0
+        self.final_bonus = 0
         self.generator = TrialGenerator(self.rng)
         self.current_trial = self.generator.generate()
