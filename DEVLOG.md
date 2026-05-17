@@ -45,3 +45,13 @@ Ho (@MattePavons) fatto in modo che le istruzioni spariscano pian piano — all'
 ## 16 maggio 2026
 
 Ho (@dany80213) riscritto quasi tutto oggi prima di aggiungere roba nuova: separato il codice in MVC (`model/`, `controller/`, `view/`), introdotto `GameController`, spostato le costanti in `config.py`, ridisegnato tutta la grafica, rimosso i file inutili e aggiunto i test di scoring.
+
+---
+
+## 17 maggio 2026
+
+Ho (@dany80213) aggiunto scoring con meter e moltiplicatore, fading delle istruzioni collegato all'`hint_level`, inter-trial interval e le schermate INTRO e PAUSA.
+
+@alessandro-guttadauro ha aggiunto i pulsanti YES/NO cliccabili — adesso si può rispondere anche col mouse oltre che con la tastiera.
+
+Il progetto si è concluso il 17 maggio 2026.
